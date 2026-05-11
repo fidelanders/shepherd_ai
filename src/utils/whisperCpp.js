@@ -1,88 +1,3 @@
-// 'use strict';
-
-// const path = require('path');
-// const { spawn } = require('child_process');
-// const fs = require('fs');
-// const env = require('../config/env');
-
-// /**
-//  * Resolves the whisper-cli binary path based on:
-//  * 1. WHISPER_BIN env var (explicit override)
-//  * 2. Platform-specific default inside whisper.cpp/build/
-//  */
-// function resolveWhisperBin() {
-//   if (env.WHISPER_BIN) return env.WHISPER_BIN;
-
-//   const base = path.join(process.cwd(), 'whisper.cpp', 'build', 'bin');
-
-//   const candidates = {
-//     win32: path.join(base, 'Release', 'whisper-cli.exe'),
-//     linux: path.join(base, 'whisper-cli'),
-//     darwin: path.join(base, 'whisper-cli'),
-//   };
-
-//   return candidates[process.platform] ?? candidates.linux;
-// }
-
-// function resolveModelPath() {
-//   if (env.WHISPER_MODEL) return env.WHISPER_MODEL;
-//   return path.join(process.cwd(), 'whisper.cpp', 'models', 'ggml-base.bin');
-// }
-
-// /**
-//  * Runs whisper-cli via spawn (safe, no shell injection) and
-//  * returns the parsed JSON transcript.
-//  */
-// async function runWhisperCpp(audioPath, outputDir) {
-//   const whisperBin = resolveWhisperBin();
-//   const modelPath = resolveModelPath();
-
-//   if (!fs.existsSync(whisperBin)) {
-//     throw new Error(
-//       `whisper-cli binary not found at "${whisperBin}". ` +
-//       `Set WHISPER_BIN in .env or build whisper.cpp first.`
-//     );
-//   }
-
-//   if (!fs.existsSync(modelPath)) {
-//     throw new Error(
-//       `Whisper model not found at "${modelPath}". ` +
-//       `Set WHISPER_MODEL in .env or download a ggml model.`
-//     );
-//   }
-
-//   fs.mkdirSync(outputDir, { recursive: true });
-
-//   const baseName = path.basename(audioPath, path.extname(audioPath));
-//   const outputBase = path.join(outputDir, baseName);
-
-//   await new Promise((resolve, reject) => {
-//     const proc = spawn(
-//       whisperBin,
-//       ['-m', modelPath, '-f', audioPath, '-oj', '-of', outputBase],
-//       { timeout: 300_000 }
-//     );
-
-//     let stderr = '';
-//     proc.stderr.on('data', d => (stderr += d.toString()));
-//     proc.on('close', code => {
-//       if (code === 0) resolve();
-//       else reject(new Error(`whisper-cli exited with code ${code}: ${stderr}`));
-//     });
-//     proc.on('error', reject);
-//   });
-
-//   // whisper.cpp appends .json to the output path
-//   const jsonPath = `${outputBase}.json`;
-//   if (!fs.existsSync(jsonPath)) {
-//     throw new Error(`whisper.cpp JSON output not found at "${jsonPath}"`);
-//   }
-
-//   return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-// }
-
-// module.exports = { runWhisperCpp, resolveWhisperBin, resolveModelPath };
-
 'use strict';
 
 const path = require('path');
@@ -94,7 +9,8 @@ const env = require('../config/env');
  * Resolve whisper.cpp binary
  */
 function resolveWhisperBin() {
-  if (env.WHISPER_BIN) {
+  // 1. Explicit env override
+  if (env.WHISPER_BIN && fs.existsSync(env.WHISPER_BIN)) {
     return env.WHISPER_BIN;
   }
 
@@ -105,13 +21,31 @@ function resolveWhisperBin() {
     'bin'
   );
 
-  const candidates = {
-    win32: path.join(base, 'Release', 'whisper-cli.exe'),
-    linux: path.join(base, 'whisper-cli'),
-    darwin: path.join(base, 'whisper-cli'),
-  };
+  // 2. Try all possible binary names
+  const candidates = [
+    // Linux/macOS newer builds
+    path.join(base, 'whisper-cli'),
 
-  return candidates[process.platform] || candidates.linux;
+    // Older whisper.cpp builds
+    path.join(base, 'main'),
+
+    // Windows
+    path.join(base, 'Release', 'whisper-cli.exe'),
+    path.join(base, 'Release', 'main.exe'),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  // 3. Helpful debug output
+  throw new Error(
+    'No whisper.cpp binary found.\n\nChecked:\n' +
+    candidates.join('\n')
+  );
+  console.log('Resolved whisper binary:', whisperBin);
 }
 
 /**
