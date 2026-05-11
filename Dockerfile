@@ -9,33 +9,40 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Set app directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files first
+# Copy package files first for Docker layer caching
 COPY package*.json ./
 
 # Install Node dependencies
 RUN npm install
 
-# Copy all project files
+# Copy application source
 COPY . .
 
-# Build whisper.cpp using CMake
-RUN cmake -B whisper.cpp/build whisper.cpp
-RUN cmake --build whisper.cpp/build --config Release
+# Build whisper.cpp
+RUN cmake -B /app/whisper.cpp/build \
+    -DCMAKE_BUILD_TYPE=Release \
+    /app/whisper.cpp
+
+RUN cmake --build /app/whisper.cpp/build --config Release -j
+
+# Debug compiled binaries (visible in Render logs)
+RUN ls -R /app/whisper.cpp/build/bin
 
 # Download Whisper model
-RUN bash ./whisper.cpp/models/download-ggml-model.sh base
+RUN bash /app/whisper.cpp/models/download-ggml-model.sh base
 
-# Debug: show compiled binaries
-RUN find whisper.cpp/build -type f
-
-# Set production environment
+# Set environment variables
 ENV NODE_ENV=production
 
-# Expose app port
+# IMPORTANT:
+# Change this to whisper-cli if your logs show whisper-cli instead of main
+ENV WHISPER_BIN=/app/whisper.cpp/build/bin/main
+
+# Expose application port
 EXPOSE 5000
 
-# Start application
+# Start app
 CMD ["npm", "start"]
