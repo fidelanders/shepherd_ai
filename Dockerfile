@@ -1,30 +1,41 @@
 FROM node:20
 
-# Install system packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     build-essential \
     cmake \
     git \
-    curl
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set app directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package*.json ./
 
-# Install dependencies
+# Install Node dependencies
 RUN npm install
 
-# Copy project files
+# Copy all project files
 COPY . .
 
-# Build whisper.cpp
-RUN cd whisper.cpp && make
+# Build whisper.cpp using CMake
+RUN cmake -B whisper.cpp/build whisper.cpp
+RUN cmake --build whisper.cpp/build --config Release
 
-# Expose port
+# Download Whisper model
+RUN bash ./whisper.cpp/models/download-ggml-model.sh base
+
+# Debug: show compiled binaries
+RUN find whisper.cpp/build -type f
+
+# Set production environment
+ENV NODE_ENV=production
+
+# Expose app port
 EXPOSE 5000
 
-# Start app
+# Start application
 CMD ["npm", "start"]
