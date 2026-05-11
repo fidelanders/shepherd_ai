@@ -24,6 +24,7 @@ pnpm-debug.log*
 # Runtime / temp files
 # ─────────────────────────────────────────────
 temp/
+exports/
 tmp/
 uploads/
 cache/
