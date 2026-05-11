@@ -1,0 +1,18 @@
+SERMON TRANSCRIPT
+============================================================
+File:       PE_Mothers' day.mp3
+Duration:   02:35
+Word count: 210
+Confidence: 36.8%
+============================================================
+
+TRANSCRIPT
+------------------------------------------------------------
+Hello, all modus and modus to be. This is wishing you happy modus day. I pray that God of  Heaven will give you the strength, the capacity, the wisdom to effectively carry out your  modeller responsibilities in Jesus' name. That true you, generations who rise in the  name of Jesus, that your light will shine across the board in the name of Jesus. Go, we  keep you, your strength will not fail in the name of Jesus, all that you need to perform  and function in this godly role of fruitfulness, you know, a role of expansion, a role of giving  life. God will supply in Jesus Christ's precious name. Your health will not fail in the name  of Jesus and generations after now we call you blessed in the name of Jesus. Happy modus day  to all our modus and also to our ladies. I pray that this year the Lord will continue to  enlarge your coast. The Bible says many daughters have done vitrously, but who will excel them  on in the name of Jesus? We appreciate each and every one of you for caring for us, for  taking care of us and for being there always. Happy modus day, have a blessed one this year.  [BLANK_AUDIO]  [BLANK_AUDIO]
+
+============================================================
+
+AI INSIGHTS
+------------------------------------------------------------
+⚠  AI insights were not generated.
+   Fix: add GEMINI_API_KEY to .env and ensure transcription succeeds.

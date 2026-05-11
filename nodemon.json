@@ -1,0 +1,5 @@
+{
+  "watch": ["server.js", "src"],
+  "ignore": ["temp/**", "uploads/**", "exports/**", "**/*.wav", "**/*.json"],
+  "ext": "js"
+}
