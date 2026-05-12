@@ -22,11 +22,8 @@ RUN npm install
 COPY . .
 
 # Build whisper.cpp
-RUN cmake -B /app/whisper.cpp/build \
-    -DCMAKE_BUILD_TYPE=Release \
-    /app/whisper.cpp
-
-RUN cmake --build /app/whisper.cpp/build --config Release -j
+RUN cmake -B whisper.cpp/build whisper.cpp
+RUN cmake --build whisper.cpp/build --config Release
 
 # Debug compiled binaries (visible in Render logs)
 RUN ls -R /app/whisper.cpp/build/bin
