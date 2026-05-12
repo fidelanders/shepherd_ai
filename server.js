@@ -23,13 +23,20 @@ const jobRoutes = require('./src/routes/jobs');
 const exportRoutes = require('./src/routes/export');
 
 // ─── Worker (runs in same process in dev; run separately in prod) ─────────────
-require('./src/workers/transcriptionWorker');
+// require('./src/workers/transcriptionWorker');
+
+if (process.env.NODE_ENV === 'production') {
+  require('./src/workers/transcriptionWorker');
+}
 
 // ─── Ensure required directories exist ───────────────────────────────────────
 ['uploads', 'exports', 'temp', 'processed'].forEach(dir => {
   fs.mkdirSync(path.join(__dirname, dir), { recursive: true });
 });
 
+if (process.env.NODE_ENV === 'production') {
+  require('./src/workers/transcriptionWorker');
+}
 // ─── App ──────────────────────────────────────────────────────────────────────
 const app = express();
 

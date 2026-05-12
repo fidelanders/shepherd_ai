@@ -4,7 +4,7 @@ require('dotenv').config();
 const { z } = require('zod');
 
 const schema = z.object({
-  PORT: z.coerce.number().default(5000),
+  PORT: z.coerce.number().optional(5000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
   // Redis — required
