@@ -99,6 +99,7 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── Start ────────────────────────────────────────────────────────────────────
+const port = process.env.PORT || 4000 
 app.listen(env.PORT, () => {
   console.log('');
   console.log('✨  Shepherd AI Backend v3.0');
