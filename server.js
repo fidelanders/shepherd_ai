@@ -11,6 +11,7 @@ const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
 
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 const { apiKeyAuth } = require('./src/middleware/auth');
 const { generalLimiter } = require('./src/middleware/rateLimiter');
@@ -36,6 +37,7 @@ if (process.env.NODE_ENV === 'production') {
 // ─── App ──────────────────────────────────────────────────────────────────────
 const app = express();
 
+
 // CORS — restrict origins in production via ALLOWED_ORIGINS env var
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '*').split(',').map(s => s.trim());
 app.use(cors({
@@ -52,6 +54,7 @@ app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Rate limiting on all API routes
 app.use('/api', generalLimiter);
+app.set('trust proxy', true); // <-- TRUST the X-Forwarded-For header for correct client IPs when behind a proxy (e.g. in production)
 
 // Static file serving
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
