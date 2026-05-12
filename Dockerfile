@@ -21,27 +21,17 @@ RUN npm install
 # Copy project files
 COPY . .
 
-# Clean old whisper.cpp build artifacts
-RUN rm -rf whisper.cpp/build
+# Fetch whisper.cpp directly
+RUN git clone https://github.com/ggml-org/whisper.cpp.git
 
-# Remove any problematic CMake cache files
-RUN find whisper.cpp -name "CMakeCache.txt" -type f -delete
+WORKDIR /app/whisper.cpp
 
-# Remove stale CMake generated folders
-RUN find whisper.cpp -name "CMakeFiles" -type d -exec rm -rf {} +
+RUN cmake -B build
+RUN cmake --build build -j$(nproc)
 
-# Configure whisper.cpp build
-RUN cmake -S whisper.cpp -B whisper.cpp/build
+RUN bash ./models/download-ggml-model.sh base
 
-# Build whisper.cpp
-RUN cmake --build whisper.cpp/build --config Release
-
-# Debug generated binaries
-RUN echo "=== BUILT BINARIES ===" && \
-    find whisper.cpp/build -type f | grep -E "whisper|main"
-
-# Download Whisper model
-RUN bash ./whisper.cpp/models/download-ggml-model.sh base
+WORKDIR /app
 
 # Production environment
 ENV NODE_ENV=production
