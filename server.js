@@ -23,11 +23,7 @@ const jobRoutes = require('./src/routes/jobs');
 const exportRoutes = require('./src/routes/export');
 
 // ─── Worker (runs in same process in dev; run separately in prod) ─────────────
-// require('./src/workers/transcriptionWorker');
-
-if (process.env.NODE_ENV === 'production') {
-  require('./src/workers/transcriptionWorker');
-}
+require('./src/workers/transcriptionWorker');
 
 // ─── Ensure required directories exist ───────────────────────────────────────
 ['uploads', 'exports', 'temp', 'processed'].forEach(dir => {
@@ -99,8 +95,8 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── Start ────────────────────────────────────────────────────────────────────
-const port = process.env.PORT || 4000 
-app.listen(env.PORT, () => {
+const Port = env.PORT || 5000;
+app.listen(Port, () => {
   console.log('');
   console.log('✨  Shepherd AI Backend v3.0');
   console.log(`🚀  Server:   http://localhost:${env.PORT}`);

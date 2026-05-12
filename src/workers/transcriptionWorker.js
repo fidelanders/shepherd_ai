@@ -12,7 +12,7 @@ const SpeakerDiarizationService = require('../services/speakerDiarization');
 const BibleVerseService = require('../services/bibleVerseService');
 const AIService = require('../services/aiService');
 
-// Shared service instances — created once, reused across jobs
+// Shared service instances
 const services = {
   transcriptionService: new TranscriptionService(),
   speakerService: new SpeakerDiarizationService(),
@@ -25,13 +25,14 @@ const worker = new Worker(
   'transcription',
   async (job) => {
     const { jobId, filePath, fileName } = job.data;
-    const attempt = job.attemptsMade + 1;          // attemptsMade is 0-indexed
+    const attempt = job.attemptsMade + 1;  // BullMQ attemptsMade is 0-indexed
     const maxAttempts = job.opts?.attempts ?? 3;
+
     return processTranscription(jobId, filePath, fileName, services, attempt, maxAttempts);
   },
   {
     connection: createConnection(),
-    concurrency: 2, // process up to 2 jobs in parallel
+    concurrency: 2,
   }
 );
 

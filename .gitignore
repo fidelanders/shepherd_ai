@@ -34,6 +34,7 @@ cache/
 # ─────────────────────────────────────────────
 # Whisper.cpp generated files
 # ─────────────────────────────────────────────
+whisper.cpp/
 whisper.cpp/models/*.bin
 whisper.cpp/models/*.gguf
 whisper.cpp/*.json
