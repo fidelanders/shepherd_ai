@@ -67,7 +67,7 @@ RUN cmake -B build -DCMAKE_BUILD_TYPE=Release
 RUN cmake --build build -j$(nproc)
 
 # Optional: smaller/faster model
-RUN bash ./models/download-ggml-model.sh tiny.en
+RUN bash ./models/download-ggml-model.sh tiny
 
 WORKDIR /app
 
